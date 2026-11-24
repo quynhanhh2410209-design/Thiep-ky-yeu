@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thiệp Mời Chụp Kỉ Yếu - Qanh</title>
+<!-- Tải Tailwind CSS để căn chỉnh layout linh hoạt -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Font chữ hỗ trợ tiếng Việt mượt mà và chuẩn chất Retro -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=VT323&display=swap" rel="stylesheet">
+<!-- Thư viện pháo giấy -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+/* Cấu hình font chữ chủ đạo */
+body {
+font-family: 'Chakra Petch', sans-serif;
+background-color: #2b2938;
+background-image: radial-gradient(#3f3c54 1.5px, transparent 1.5px);
+background-size: 20px 20px;
+min-height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 12px;
+margin: 0;
+overflow-x: hidden;
+user-select: none;
+touch-action: manipulation;
+}
+
+.font-retro-en {
+font-family: 'VT323', monospace;
+letter-spacing: 0.05em;
+}
+
+/* Vỏ máy chơi game cầm tay màu kem retro */
+.gameboy-shell {
+background: linear-gradient(145deg, #f7f3e8, #eae3d2);
+border-radius: 22px 22px 64px 22px;
+box-shadow:
+0 24px 50px rgba(0, 0, 0, 0.45),
+inset 0 4px 6px rgba(255, 255, 255, 0.9),
+inset -6px -8px 14px rgba(184, 174, 152, 0.65);
+border: 3px solid #d5ccb8;
+width: 100%;
+max-width: 440px;
+padding: 18px 18px 28px 18px;
+position: relative;
+transition: transform 0.2s ease;
+}
+
+/* Rãnh trang trí phía trên vỏ máy */
+.top-grooves {
+display: flex;
+justify-content: space-between;
+border-bottom: 2px solid #d6ceb9;
+padding-bottom: 8px;
+margin-bottom: 12px;
+}
+
+/* Khung viền màn hình xám đậm */
+.screen-bezel {
+background-color: #464454;
+border-radius: 14px 14px 38px 14px;
+padding: 14px 14px 20px 14px;
+box-shadow:
+inset 0 3px 8px rgba(0, 0, 0, 0.5),
+0 2px 0 rgba(255, 255, 255, 0.7);
+border: 2px solid #353340;
+}
+
+/* Đèn báo nguồn BATTERY */
+.battery-led {
+width: 10px;
+height: 10px;
+border-radius: 50%;
+background-color: #ff3b30;
+box-shadow: 0 0 8px #ff3b30, 0 0 14px #ff6b6b;
+animation: pulseLed 2s infinite;
+}
+
+@keyframes pulseLed {
+0%, 100% { opacity: 1; }
+50% { opacity: 0.65; }
+}
+
+/* Màn hình LCD xanh lá hoài niệm sáng sủa */
+.lcd-screen {
+background-color: #cde3b5;
+background-image:
+linear-gradient(rgba(155, 188, 122, 0.25) 1px, transparent 1px),
+linear-gradient(90deg, rgba(155, 188, 122, 0.25) 1px, transparent 1px);
+background-size: 4px 4px;
+border: 4px solid #2b3826;
+border-radius: 8px;
+box-shadow: inset 0 4px 12px rgba(26, 41, 22, 0.25);
+color: #1a2b19;
+min-height: 360px;
+position: relative;
+overflow: hidden;
+}
+
+/* Hiệu ứng rung khi trả lời sai */
+@keyframes shake {
+0%, 100% { transform: translateX(0); }
+20% { transform: translateX(-8px) rotate(-1deg); }
+40% { transform: translateX(8px) rotate(1deg); }
+60% { transform: translateX(-6px); }
+80% { transform: translateX(6px); }
+}
+
+.shake-anim {
+animation: shake 0.4s ease-in-out;
+}
+
+/* Nút chọn đáp án trắc nghiệm */
+.quiz-option {
+background-color: #e6f2d8;
+border: 2px solid #263d24;
+border-radius: 10px;
+padding: 10px 14px;
+font-weight: 700;
+text-align: left;
+transition: all 0.15s ease;
+box-shadow: 0 3px 0 #263d24;
+cursor: pointer;
+display: flex;
+align-items: center;
+gap: 10px;
+color: #182b17;
+touch-action: manipulation;
+}
+
+.quiz-option:hover {
+background-color: #ffffff;
+transform: translateY(-1px);
+}
+
+.quiz-option:active {
+transform: translateY(2px);
+box-shadow: 0 1px 0 #263d24;
+}
+
+.quiz-option.wrong {
+background-color: #ffd6d6;
+border-color: #a61e1e;
+color: #821313;
+box-shadow: 0 3px 0 #a61e1e;
+}
+
+/* Nút xác nhận RSVP */
+.confirm-btn {
+background: linear-gradient(180deg, #37b24d, #2b8a3e);
+color: #ffffff;
+border: 2px solid #184d23;
+border-radius: 10px;
+padding: 10px 14px;
+font-weight: 700;
+box-shadow: 0 4px 0 #184d23;
+cursor: pointer;
+transition: all 0.15s ease;
+}
+
+.confirm-btn:hover {
+filter: brightness(1.06);
+}
+
+.confirm-btn:active {
+transform: translateY(3px);
+box-shadow: 0 1px 0 #184d23;
+}
+
+/* Nút từ chối chạy trốn */
+.dodge-btn {
+background-color: #f1f3f5;
+color: #495057;
+border: 2px solid #495057;
+border-radius: 10px;
+padding: 10px 12px;
+font-weight: 600;
+box-shadow: 0 3px 0 #495057;
+cursor: pointer;
+transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+position: relative;
+z-index: 20;
+}
+
+/* Nút bật tắt âm thanh góc trên */
+.sound-pill {
+background-color: #e2dac6;
+border: 2px solid #b5ab94;
+border-radius: 999px;
+padding: 4px 12px;
+font-size: 12px;
+font-weight: 700;
+color: #3f3b32;
+box-shadow: 0 2px 0 #b5ab94;
+cursor: pointer;
+display: flex;
+align-items: center;
+gap: 5px;
+transition: all 0.12s ease;
+}
+
+.sound-pill:active {
+transform: translateY(2px);
+box-shadow: none;
+}
+
+/* Phím điều hướng chữ thập D-Pad */
+.dpad-container {
+position: relative;
+width: 96px;
+height: 96px;
+}
+
+.dpad-vertical {
+position: absolute;
+left: 32px;
+top: 0;
+width: 32px;
+height: 96px;
+background: #2f2e36;
+border-radius: 6px;
+box-shadow: 0 4px 0 #18171c, inset 0 2px 3px rgba(255,255,255,0.2);
+}
+
+.dpad-horizontal {
+position: absolute;
+top: 32px;
+left: 0;
+width: 96px;
+height: 32px;
+background: #2f2e36;
+border-radius: 6px;
+box-shadow: 0 4px 0 #18171c, inset 0 2px 3px rgba(255,255,255,0.2);
+}
+
+.dpad-center {
+position: absolute;
+top: 34px;
+left: 34px;
+width: 28px;
+height: 28px;
+background: radial-gradient(circle, #222126 30%, #2f2e36 70%);
+border-radius: 50%;
+z-index: 2;
+}
+
+/* Nút tròn A và B */
+.ab-group {
+display: flex;
+gap: 14px;
+transform: rotate(-24deg);
+background: rgba(212, 203, 184, 0.55);
+padding: 8px 12px;
+border-radius: 999px;
+border: 1px solid #cfc5af;
+}
+
+.action-btn {
+width: 42px;
+height: 42px;
+border-radius: 50%;
+background: linear-gradient(145deg, #c92a5b, #9c1b43);
+box-shadow: 0 4px 0 #630f29, inset 0 2px 4px rgba(255,255,255,0.35);
+border: 2px solid #7a1434;
+color: rgba(255,255,255,0.85);
+font-weight: 700;
+font-size: 13px;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+transition: transform 0.1s;
+}
+
+.action-btn:active {
+transform: translateY(3px);
+box-shadow: 0 1px 0 #630f29;
+}
+
+/* Nút SELECT / START nghiêng */
+.pill-btn {
+width: 44px;
+height: 12px;
+background: #7c7785;
+border-radius: 999px;
+transform: rotate(-24deg);
+box-shadow: 0 2px 0 #4d4954, inset 0 1px 2px rgba(255,255,255,0.4);
+border: 1px solid #595561;
+}
+
+/* Khe loa góc dưới bên phải */
+.speaker-slots {
+display: flex;
+gap: 6px;
+transform: rotate(-28deg);
+}
+
+.speaker-slot {
+width: 5px;
+height: 34px;
+background-color: #b8af9c;
+border-radius: 999px;
+box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.35);
+}
+
+/* Hiệu ứng hiện dần nội dung */
+.fade-in-up {
+animation: fadeInUp 0.45s ease forwards;
+}
+
+@keyframes fadeInUp {
+from {
+opacity: 0;
+transform: translateY(10px);
+}
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+</style>
+</head>
+<body>
+
+<!-- Thân máy chơi game cầm tay Retro -->
+<main id="consoleShell" class="gameboy-shell">
+
+<!-- Thanh thương hiệu phía trên cùng -->
+<div class="top-grooves items-center">
+<div class="flex items-center gap-2">
+<span class="font-bold text-base sm:text-lg tracking-wider text-[#36334a]">
+QANH-GIRL
+</span>
+<span class="bg-[#3c3952] text-[#f7f3e8] text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded">
+EDITION 2026
+</span>
+</div>
+
+<!-- Nút công tắc bật/tắt âm thanh 8-bit -->
+<button id="soundToggleBtn" type="button" class="sound-pill" onclick="toggleSound()">
+<span id="soundIcon">🔊</span>
+<span id="soundLabel">Âm thanh: BẬT</span>
+</button>
+</div>
+
+<!-- Khung viền màn hình xám đậm -->
+<div class="screen-bezel">
+<!-- Dòng trạng thái pin & stereo -->
+<div class="flex items-center justify-between mb-2 px-1">
+<div class="flex items-center gap-2">
+<span class="battery-led"></span>
+<span class="font-retro-en text-xs text-[#c7c4d4] tracking-widest">BATTERY</span>
+</div>
+<div class="h-[2px] flex-1 mx-3 bg-gradient-to-r from-[#a63a50] via-[#4a4e8c] to-[#a63a50] opacity-75"></div>
+<span class="font-retro-en text-xs text-[#c7c4d4] tracking-widest">DOT MATRIX STEREO</span>
+</div>
+
+<!-- Màn hình LCD chính -->
+<div class="lcd-screen p-3 sm:p-4">
+
+<!-- ==========================================
+MÀN HÌNH 1: TRẠM KIỂM SOÁT CÂU HỎI BÍ MẬT
+========================================== -->
+<div id="gatekeeperScreen" class="space-y-3.5">
+<div class="flex items-center justify-between border-b-2 border-[#263d24] pb-2">
+<span class="bg-[#263d24] text-[#cde3b5] text-xs font-bold px-2.5 py-0.5 rounded">
+🔒 SECURITY CHECK
+</span>
+<span class="font-retro-en text-sm font-bold text-[#263d24]">LV.01</span>
+</div>
+
+<div class="bg-[#e6f2d8]/90 border-2 border-[#263d24] rounded-xl p-3 text-center space-y-1">
+<p class="text-xs font-bold uppercase tracking-wider text-[#2b6cb0]">
+Trạm kiểm soát người quen
+</p>
+<h1 class="text-lg sm:text-xl font-bold text-[#142413]">
+"Qanh thích gì nhất?"
+</h1>
+<p class="text-xs text-[#375235]">
+Chọn đúng mật mã để mở khóa thiệp mời nhé!
+</p>
+</div>
+
+<!-- 4 Đáp án lựa chọn -->
+<div class="grid grid-cols-1 gap-2.5" id="optionsContainer">
+<button type="button" class="quiz-option" onclick="checkAnswer(this, 'Nic')">
+<span class="bg-[#263d24] text-[#cde3b5] w-6 h-6 rounded flex items-center justify-center text-xs font-bold">A</span>
+<span>Nic</span>
+</button>
+<button type="button" class="quiz-option" onclick="checkAnswer(this, 'Bánh kem')">
+<span class="bg-[#263d24] text-[#cde3b5] w-6 h-6 rounded flex items-center justify-center text-xs font-bold">B</span>
+<span>Bánh kem</span>
+</button>
+<button type="button" class="quiz-option" onclick="checkAnswer(this, 'Tiểu thuyết')">
+<span class="bg-[#263d24] text-[#cde3b5] w-6 h-6 rounded flex items-center justify-center text-xs font-bold">C</span>
+<span>Tiểu thuyết</span>
+</button>
+<button type="button" class="quiz-option" onclick="checkAnswer(this, 'Ngủ')">
+<span class="bg-[#263d24] text-[#cde3b5] w-6 h-6 rounded flex items-center justify-center text-xs font-bold">D</span>
+<span>Ngủ</span>
+</button>
+</div>
+
+<!-- Thông báo trêu chọc khi chọn sai -->
+<div id="wrongFeedback" class="hidden bg-[#ffe3e3] border-2 border-[#c92a2a] text-[#961919] rounded-lg p-2.5 text-xs font-bold text-center">
+</div>
+
+<!-- Thanh tiến trình mở khóa khi chọn đúng -->
+<div id="unlockProgressBox" class="hidden bg-[#f3faea] border-2 border-[#2b8a3e] rounded-lg p-3 space-y-2">
+<div class="flex justify-between text-xs font-bold text-[#1e632d]">
+<span>🎉 Chuẩn không cần chỉnh! Đang mở khóa...</span>
+<span id="progressPercent">0%</span>
+</div>
+<div class="w-full h-3 bg-[#c3deb0] rounded-full overflow-hidden border border-[#1e632d]">
+<div id="progressBar" class="h-full bg-[#2b8a3e] transition-all duration-100" style="width: 0%"></div>
+</div>
+</div>
+</div>
+
+<!-- ==========================================
+MÀN HÌNH 2: THIỆP MỜI KỈ YẾU CHÍNH
+========================================== -->
+<div id="invitationScreen" class="hidden space-y-3 fade-in-up">
+<!-- Thanh trạng thái UNLOCKED và nút khóa lại -->
+<div class="flex items-center justify-between border-b-2 border-[#263d24] pb-2">
+<span class="bg-[#2b8a3e] text-white text-xs font-bold px-2.5 py-0.5 rounded shadow-sm">
+★ UNLOCKED ★
+</span>
+<button type="button" onclick="lockAgain()" class="text-xs font-bold text-[#263d24] underline hover:opacity-75 cursor-pointer">
+↻ Khóa lại
+</button>
+</div>
+
+<!-- Tiêu đề chính ở giữa -->
+<div class="text-center py-1">
+<div class="inline-flex items-center gap-1.5 mb-1.5 bg-[#1f331e] text-[#dcf0c8] px-3 py-1 rounded-full">
+<span class="text-sm">🎓</span>
+<span class="font-retro-en text-sm font-bold uppercase">GRADUATION DAY</span>
+<span class="text-sm">📸</span>
+</div>
+<h2 class="text-xl sm:text-2xl font-bold uppercase text-[#142413]">
+THƯ MỜI CHỤP KỈ YẾU
+</h2>
+<p class="text-xs sm:text-sm font-semibold text-[#2b8a3e]">
+✨ Lưu giữ thanh xuân cùng Qanh ✨
+</p>
+</div>
+
+<!-- Khung lời nhắn mở đầu giữ nguyên từng chữ -->
+<div class="bg-[#f3faea] border-2 border-[#1f331e] rounded-xl p-3 text-xs sm:text-sm leading-relaxed space-y-2 shadow-sm">
+<p>
+Gửi cậu — một mảnh ghép đáng nhớ trong thanh xuân của <b>Qanh</b>! 🎓
+</p>
+<p>
+Vậy là quãng đời học sinh sắp khép lại rồi. Qanh thân mời cậu đến chung vui, chụp cùng Qanh vài tấm ảnh thật xinh để lưu giữ kỉ niệm đẹp nhất này nhé!
+</p>
+</div>
+
+<!-- Khung thông tin chi tiết buổi chụp (kẻ nét đứt retro) -->
+<div class="bg-white/80 border-2 border-dashed border-[#1f331e] rounded-xl p-3 space-y-2 text-xs sm:text-sm">
+<div class="flex items-start gap-2">
+<span class="font-bold min-w-[96px]">📅 Thời gian:</span>
+<span class="font-bold text-[#142413]">8h sáng - Ngày 21/02</span>
+</div>
+<div class="flex items-start gap-2">
+<span class="font-bold min-w-[96px]">📍 Địa điểm:</span>
+<span class="font-bold text-[#142413]">Trường THPT Tuệ Tĩnh</span>
+</div>
+<div class="flex items-start gap-2">
+<span class="font-bold min-w-[96px]">👗 Trang phục:</span>
+<span>Ăn mặc thật tươi tắn, xinh xắn (hoặc đồng phục/áo dài tùy concept)</span>
+</div>
+</div>
+
+<!-- Phần xác nhận tham gia (RSVP) -->
+<div id="rsvpFormBox" class="bg-[#e6f2d8] border-2 border-[#1f331e] rounded-xl p-3 space-y-2.5">
+<p class="text-xs font-bold uppercase text-[#1f331e] flex items-center gap-1.5">
+<span>💌</span> Xác nhận tham gia cùng Qanh
+</p>
+
+<input
+type="text"
+id="guestNameInput"
+placeholder="Tên của cậu là gì?"
+class="w-full bg-white border-2 border-[#263d24] rounded-lg px-3 py-2 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#2b8a3e]"
+/>
+
+<textarea
+id="guestMessageInput"
+rows="2"
+placeholder="Để lại lời nhắn cho Qanh nhé..."
+class="w-full bg-white border-2 border-[#263d24] rounded-lg px-3 py-2 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#2b8a3e] resize-none"
+></textarea>
+
+<!-- Thông báo năn nỉ khi bấm nhầm nút từ chối -->
+<p id="dodgeNotice" class="hidden text-xs font-bold text-[#b82525] text-center bg-[#ffe3e3] py-1 px-2 rounded border border-[#b82525]"></p>
+
+<div class="flex flex-col sm:flex-row gap-2 pt-1 relative min-h-[46px]">
+<button
+type="button"
+onclick="submitRsvp()"
+class="confirm-btn flex-1 text-xs sm:text-sm"
+>
+Chắc chắn có mặt! 🎉
+</button>
+<button
+type="button"
+id="dodgeBtn"
+onmouseenter="evadeButton()"
+ontouchstart="evadeButton(event)"
+onclick="evadeButton(event)"
+class="dodge-btn text-xs sm:text-sm"
+>
+Bận mất rồi... 🥺
+</button>
+</div>
+</div>
+
+<!-- Thẻ xác nhận thành công -->
+<div id="rsvpSuccess" class="hidden bg-[#f3faea] border-2 border-[#2b8a3e] rounded-xl p-3.5 text-center space-y-2 fade-in-up">
+<div class="inline-block bg-[#2b8a3e] text-white text-[11px] font-bold px-3 py-0.5 rounded-full">
+✅ ĐÃ CHỐT LỊCH
+</div>
+<p class="text-sm font-bold text-[#133b1b]">
+Yay! Hẹn gặp <span id="confirmedName" class="underline">cậu</span> lúc 8h sáng ngày 21/02 tại Trường THPT Tuệ Tĩnh nha! 📸✨
+</p>
+<div id="confirmedMessageBox" class="hidden bg-white border border-[#2b8a3e] rounded-lg p-2 text-xs italic text-[#234729]">
+"<span id="confirmedMessageText"></span>"
+</div>
+<button type="button" onclick="resetRsvp()" class="text-[11px] font-bold text-[#2b8a3e] underline cursor-pointer">
+Sửa lại thông tin xác nhận
+</button>
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- ==========================================
+CỤM NÚT BẤM TRANG TRÍ THÂN MÁY GAME RETRO
+========================================== -->
+<div class="mt-5 px-2">
+<div class="flex items-center justify-between">
+<!-- Cụm phím điều hướng chữ thập D-pad bên trái -->
+<div class="dpad-container" onclick="playBeep(440, 0.05)">
+<div class="dpad-vertical"></div>
+<div class="dpad-horizontal"></div>
+<div class="dpad-center"></div>
+</div>
+
+<!-- Hai nút tròn A và B màu đỏ/hồng bên phải -->
+<div class="ab-group">
+<button type="button" class="action-btn" onclick="playBeep(523.25, 0.08)" title="Nút B">B</button>
+<button type="button" class="action-btn" onclick="playBeep(659.25, 0.08)" title="Nút A">A</button>
+</div>
+</div>
+
+<!-- Hai nút nghiêng SELECT / START ở giữa -->
+<div class="flex justify-center gap-6 mt-3">
+<div class="flex flex-col items-center gap-1 cursor-pointer" onclick="playBeep(330, 0.06)">
+<div class="pill-btn"></div>
+<span class="font-retro-en text-[11px] font-bold text-[#5a5469] tracking-widest">SELECT</span>
+</div>
+<div class="flex flex-col items-center gap-1 cursor-pointer" onclick="playBeep(392, 0.06)">
+<div class="pill-btn"></div>
+<span class="font-retro-en text-[11px] font-bold text-[#5a5469] tracking-widest">START</span>
+</div>
+</div>
+
+<!-- Các khe loa ở góc dưới cùng bên phải -->
+<div class="flex justify-end mt-2 pr-1">
+<div class="speaker-slots">
+<div class="speaker-slot"></div>
+<div class="speaker-slot"></div>
+<div class="speaker-slot"></div>
+<div class="speaker-slot"></div>
+<div class="speaker-slot"></div>
+<div class="speaker-slot"></div>
+</div>
+</div>
+</div>
+
+</main>
+
+<script>
+// ==========================================
+// HỆ THỐNG ÂM THANH 8-BIT (WEB AUDIO API)
+// ==========================================
+let soundEnabled = true;
+let audioCtx = null;
+
+function initAudio() {
+if (!audioCtx) {
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+if (AudioContext) {
+audioCtx = new AudioContext();
+}
+}
+if (audioCtx && audioCtx.state === 'suspended') {
+audioCtx.resume();
+}
+}
+
+function playBeep(freq = 520, duration = 0.08, type = 'square') {
+if (!soundEnabled) return;
+try {
+initAudio();
+if (!audioCtx) return;
+const osc = audioCtx.createOscillator();
+const gain = audioCtx.createGain();
+osc.type = type;
+osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+osc.connect(gain);
+gain.connect(audioCtx.destination);
+osc.start();
+osc.stop(audioCtx.currentTime + duration);
+} catch (e) {
+// Bỏ qua nếu trình duyệt chặn autoplay audio
+}
+}
+
+function playWrongSound() {
+playBeep(180, 0.12, 'sawtooth');
+setTimeout(() => playBeep(140, 0.18, 'sawtooth'), 110);
+}
+
+function playVictorySound() {
+const notes = [523.25, 659.25, 783.99, 1046.50];
+notes.forEach((freq, idx) => {
+setTimeout(() => playBeep(freq, 0.12, 'square'), idx * 90);
+});
+}
+
+function toggleSound() {
+soundEnabled = !soundEnabled;
+const icon = document.getElementById('soundIcon');
+const label = document.getElementById('soundLabel');
+if (soundEnabled) {
+icon.textContent = '🔊';
+label.textContent = 'Âm thanh: BẬT';
+playBeep(660, 0.08);
+} else {
+icon.textContent = '🔇';
+label.textContent = 'Âm thanh: TẮT';
+}
+}
+
+// ==========================================
+// LOGIC MÀN HÌNH KHÓA CÂU HỎI BÍ MẬT
+// ==========================================
+const WRONG_MESSAGES = {
+'Bánh kem': '🍰 Bánh kem cũng ngon thật, nhưng vẫn xếp sau một thứ quan trọng hơn! Chọn lại nha~',
+'Tiểu thuyết': '📖 Cày tiểu thuyết đúng gu rồi đó, cơ mà chưa phải "nhất" đâu cậu ơi!',
+'Ngủ': '😴 Ngủ thì ai chả mê, nhưng đối với Qanh vẫn có thứ đỉnh hơn thế nữa! Thử lại nào~'
+};
+
+let isUnlocking = false;
+
+function checkAnswer(btnElement, selectedAnswer) {
+if (isUnlocking) return;
+
+const shell = document.getElementById('consoleShell');
+const wrongBox = document.getElementById('wrongFeedback');
+
+if (selectedAnswer === 'Nic') {
+isUnlocking = true;
+wrongBox.classList.add('hidden');
+playVictorySound();
+
+// Đánh dấu nút đúng màu xanh
+btnElement.style.backgroundColor = '#b2f2bb';
+btnElement.style.borderColor = '#2b8a3e';
+
+// Bắn pháo giấy chúc mừng
+if (typeof confetti === 'function') {
+confetti({
+particleCount: 75,
+spread: 65,
+origin: { y: 0.6 }
+});
+}
+
+// Hiển thị và chạy thanh tiến trình mở khóa
+const progressBox = document.getElementById('unlockProgressBox');
+const progressBar = document.getElementById('progressBar');
+const progressPercent = document.getElementById('progressPercent');
+progressBox.classList.remove('hidden');
+
+let percent = 0;
+const timer = setInterval(() => {
+percent += 10;
+progressBar.style.width = percent + '%';
+progressPercent.textContent = percent + '%';
+
+if (percent >= 100) {
+clearInterval(timer);
+setTimeout(() => {
+document.getElementById('gatekeeperScreen').classList.add('hidden');
+document.getElementById('invitationScreen').classList.remove('hidden');
+isUnlocking = false;
+}, 250);
+}
+}, 75);
+
+} else {
+// Xử lý khi chọn sai
+playWrongSound();
+btnElement.classList.add('wrong');
+
+shell.classList.remove('shake-anim');
+void shell.offsetWidth; // Trigger reflow để chạy lại animation
+shell.classList.add('shake-anim');
+
+wrongBox.textContent = WRONG_MESSAGES[selectedAnswer] || 'Sai mất rồi, đoán lại đi cậu ơi!';
+wrongBox.classList.remove('hidden');
+}
+}
+
+function lockAgain() {
+playBeep(350, 0.08);
+document.getElementById('invitationScreen').classList.add('hidden');
+document.getElementById('gatekeeperScreen').classList.remove('hidden');
+document.getElementById('unlockProgressBox').classList.add('hidden');
+document.getElementById('progressBar').style.width = '0%';
+document.getElementById('wrongFeedback').classList.add('hidden');
+
+// Reset trạng thái các nút trắc nghiệm
+const options = document.querySelectorAll('.quiz-option');
+options.forEach(opt => {
+opt.classList.remove('wrong');
+opt.style.backgroundColor = '';
+opt.style.borderColor = '';
+});
+}
+
+// ==========================================
+// LOGIC NÚT TỪ CHỐI NÉ TRÁNH & XÁC NHẬN RSVP
+// ==========================================
+const PLEA_LINES = [
+'Ơ kìa đừng bấm nút này mà, đi chụp với Qanh đi! 🥺',
+'Nút này bị hỏng rồi, bấm nút màu xanh bên cạnh đi cậu ơi! ✨',
+'Thiếu cậu là mất vui lắm luôn á, suy nghĩ lại nha~ 📸',
+'Bắt không được đâuuu, chốt lịch đi chụp kỉ yếu thôi! 🎓'
+ ];
+let dodgeCount = 0;
+
+function evadeButton(event) {
+if (event) event.preventDefault();
+playBeep(600, 0.05);
+
+const btn = document.getElementById('dodgeBtn');
+const notice = document.getElementById('dodgeNotice');
+
+// Tạo tọa độ dịch chuyển ngẫu nhiên trong phạm vi an toàn
+const randomX = (Math.random() > 0.5 ? 1 : -1) * (40 + Math.floor(Math.random() * 55));
+const randomY = (Math.random() > 0.5 ? 1 : -1) * (22 + Math.floor(Math.random() * 35));
+
+btn.style.transform = translate(${randomX}px, ${randomY}px);
+
+const line = PLEA_LINES[dodgeCount % PLEA_LINES.length];
+dodgeCount++;
+notice.textContent = line;
+notice.classList.remove('hidden');
+}
+
+function submitRsvp() {
+playVictorySound();
+
+const nameInput = document.getElementById('guestNameInput').value.trim();
+const msgInput = document.getElementById('guestMessageInput').value.trim();
+
+const displayName = nameInput || 'cậu';
+document.getElementById('confirmedName').textContent = displayName;
+
+const msgBox = document.getElementById('confirmedMessageBox');
+const msgText = document.getElementById('confirmedMessageText');
+
+if (msgInput) {
+msgText.textContent = msgInput;
+msgBox.classList.remove('hidden');
+} else {
+msgBox.classList.add('hidden');
+}
+
+document.getElementById('rsvpFormBox').classList.add('hidden');
+document.getElementById('rsvpSuccess').classList.remove('hidden');
+
+if (typeof confetti === 'function') {
+confetti({
+particleCount: 60,
+spread: 55,
+origin: { y: 0.7 }
+});
+}
+}
+
+function resetRsvp() {
+playBeep(440, 0.06);
+document.getElementById('rsvpSuccess').classList.add('hidden');
+document.getElementById('rsvpFormBox').classList.remove('hidden');
+const dodgeBtn = document.getElementById('dodgeBtn');
+dodgeBtn.style.transform = 'translate(0, 0)';
+document.getElementById('dodgeNotice').classList.add('hidden');
+}
+</script>
+</body>
+</html>
